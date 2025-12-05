@@ -1009,32 +1009,40 @@
         let countdownInterval = null;
         let winnerAnnouncementTime = null;
 
-        async function register() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            const role = document.getElementById('authRole').value;
+              // استبدل دالة register بهذه النسخة:
+async function register() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const role = document.getElementById('authRole').value;
 
-            if (!email || !password) {
-                alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
-                return;
-            }
+    if (!email || !password) {
+        alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+        return;
+    }
 
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .insert([{ email, password, role }])
-                    .select();
+    // منع تسجيل مسؤول من صفحة التسجيل الرئيسية
+    if (role === 'admin') {
+        alert('⚠️ عذراً، لا يمكن تسجيل حسابات مسؤول!\nيمكنك التسجيل كمستخدم عادي أو بائع فقط.');
+        return;
+    }
 
-                if (error) throw error;
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{ email, password, role }])
+            .select();
 
-                alert('تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول');
-                document.getElementById('authEmail').value = '';
-                document.getElementById('authPassword').value = '';
-            } catch (error) {
-                alert('خطأ في التسجيل: ' + error.message);
-            }
-        }
+        if (error) throw error;
 
+        alert('✅ تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول');
+        document.getElementById('authEmail').value = '';
+        document.getElementById('authPassword').value = '';
+        // إعادة تعيين الدور إلى مستخدم عادي
+        document.getElementById('authRole').value = 'user';
+    } catch (error) {
+        alert('خطأ في التسجيل: ' + error.message);
+    }
+}
         async function login() {
             const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
@@ -1892,4 +1900,5 @@
         }
     </script>
 </body>
+
 </html>
